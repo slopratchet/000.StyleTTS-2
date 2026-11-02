@@ -1,0 +1,51 @@
+{
+  "pipeline_name": "StyleTTS-2 High-Performance Speech Synthesis Pipeline",
+  "version": "2.0",
+  "description": "Style diffusion and adversarial training text-to-speech with zero-shot voice cloning",
+  "audio_specifications": {
+    "sample_rate": 24000,
+    "channels": 1,
+    "format": "WAV",
+    "encoding": "PCM_16"
+  },
+  "model_configuration": {
+    "architecture": "StyleTTS 2",
+    "base_checkpoint": "yl4579/StyleTTS2-LibriTTS",
+    "weights_file": "models/LibriTTS/epochs_2nd_00020.pth",
+    "config_file": "models/LibriTTS/config.yml",
+    "features": [
+      "Style Diffusion Latent Sampling",
+      "Large Speech Language Model Discriminator",
+      "Zero-Shot Speaker Adaptation"
+    ]
+  },
+  "generation_defaults": {
+    "diffusion_steps": 5,
+    "alpha": 0.3,
+    "beta": 0.7,
+    "embedding_scale": 1.0,
+    "speed": 1.0,
+    "phonemizer": "gruut / espeak-ng"
+  },
+  "voice_cloning": {
+    "enabled": true,
+    "reference_directory": "input/",
+    "supported_reference_formats": [".wav", ".mp3", ".flac"],
+    "minimum_reference_duration_sec": 3.0,
+    "optimal_reference_duration_sec": 10.0
+  },
+  "hardware_constraints": {
+    "target_gpu": "NVIDIA RTX 2060 (6GB VRAM) or equivalent CUDA GPU",
+    "vram_requirement": "2GB - 4GB VRAM during diffusion sampling",
+    "cpu_fallback": true,
+    "batch_size": 1
+  },
+  "worker_sower_routing": {
+    "watch_directory": "input",
+    "output_directory": "output",
+    "archive_directory": "input/processed",
+    "poll_interval_seconds": 3,
+    "auto_match_paired_audio": true
+  }
+}
+

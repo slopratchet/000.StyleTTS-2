@@ -1,0 +1,2 @@
+StyleTTS 2 is an advanced text-to-speech system that models human speaking style through diffusion. It delivers natural prosody, expressive inflection, and zero-shot voice cloning.
+
