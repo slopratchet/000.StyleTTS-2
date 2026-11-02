@@ -7,9 +7,10 @@ A localized, self-contained pipeline for neural voice cloning, latent style merg
 ## Table of Contents
 1. [Architecture Overview](#architecture-overview)
 2. [Quick Start & Batch Files](#quick-start--batch-files)
-   - [1. `merge_voices.bat`](#1-merge_voicesbat)
-   - [2. `synthesize_dialogue.bat`](#2-synthesize_dialoguebat)
-   - [3. `run_styletts2.bat`](#3-run_styletts2bat)
+   - [1. `preprocess_audio.bat`](#1-preprocess_audiobat)
+   - [2. `merge_voices.bat`](#2-merge_voicesbat)
+   - [3. `synthesize_dialogue.bat`](#3-synthesize_dialoguebat)
+   - [4. `run_styletts2.bat`](#4-run_styletts2bat)
 3. [Directory Layout](#directory-layout)
 4. [Python Scripts & CLI Reference](#python-scripts--cli-reference)
 5. [Acoustic Architecture: Latent Style Blending](#acoustic-architecture-latent-style-blending)
@@ -46,7 +47,15 @@ the diffusion vocoder synthesizes speech as a **single, organic vocal identity**
 
 The repository is equipped with dedicated Windows batch scripts configured to utilize the embedded Python environment and local eSpeak-NG phonemizer out of the box.
 
-### 1. `merge_voices.bat`
+### 1. `preprocess_audio.bat`
+Automates DSP acoustic hygiene for raw reference audio before voice blending.
+- **80 Hz High-Pass Filter:** Strips HVAC and sub-bass microphone handling rumble ($18\text{ dB/octave}$ zero-phase Butterworth).
+- **Dynamic De-Esser:** Clamps excessive sibilance ($6\text{ kHz} - 9\text{ kHz}$) to prevent whistling vocoder artifacts.
+- **Silence Trimming & Padding:** Strips ambient head/tail silence with energy-based VAD and appends clean $100\text{ ms}$ headroom.
+- **Peak Normalization:** Conforms audio to $-1.0\text{ dBFS}$ with integrated RMS auditing.
+- **Outputs Produced:** Creates `input/clean_<filename>.wav` for every source clip.
+
+### 2. `merge_voices.bat`
 Merges two reference audio clips into a frozen style vector (`merged_identity.pt`) and exports a verification WAV file.
 
 - **Standard Run:** Place two WAV clips at `input/voice_a.wav` and `input/voice_b.wav`, then double-click `merge_voices.bat`.
@@ -62,7 +71,7 @@ Merges two reference audio clips into a frozen style vector (`merged_identity.pt
 
 ---
 
-### 2. `synthesize_dialogue.bat`
+### 3. `synthesize_dialogue.bat`
 Synthesizes speech using the frozen `output/merged_identity.pt` created by the voice merger.
 
 - **Interactive Mode:** Double-click the script. When prompted, type or paste your dialogue and press `Enter`.
@@ -76,7 +85,7 @@ Synthesizes speech using the frozen `output/merged_identity.pt` created by the v
 
 ---
 
-### 3. `run_styletts2.bat`
+### 4. `run_styletts2.bat`
 The core launcher script that runs the default voice merging pipeline and checks environment integrity.
 
 ---
@@ -104,8 +113,10 @@ The core launcher script that runs the default voice merging pipeline and checks
 ├── scripts/                        # Automation & inference scripts
 │   ├── llm_serving_example.py      # Zero-drift streaming LLM serving template
 │   ├── merge_voices.py             # Latent style interpolation & export engine
+│   ├── preprocess_audio.py         # DSP pre-processing (HPF, de-esser, silence trim, peak norm)
 │   └── synthesize_dialogue.py      # Dialogue synthesizer supporting long-form text
 ├── merge_voices.bat                # 1-click batch launcher for voice blending
+├── preprocess_audio.bat            # 1-click batch launcher for audio DSP pre-processing
 ├── synthesize_dialogue.bat         # 1-click batch launcher for dialogue synthesis
 └── run_styletts2.bat               # Master runner batch file
 ```

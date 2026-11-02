@@ -21,8 +21,21 @@ echo ========================================================
 set "VOICE_A=%~1"
 set "VOICE_B=%~2"
 
-if "%VOICE_A%"=="" set "VOICE_A=%~dp0input\voice_a.wav"
-if "%VOICE_B%"=="" set "VOICE_B=%~dp0input\voice_b.wav"
+if "%VOICE_A%"=="" (
+    if exist "%~dp0input\clean_voice_a.wav" (
+        set "VOICE_A=%~dp0input\clean_voice_a.wav"
+    ) else (
+        set "VOICE_A=%~dp0input\voice_a.wav"
+    )
+)
+
+if "%VOICE_B%"=="" (
+    if exist "%~dp0input\clean_voice_b.wav" (
+        set "VOICE_B=%~dp0input\clean_voice_b.wav"
+    ) else (
+        set "VOICE_B=%~dp0input\voice_b.wav"
+    )
+)
 
 if not exist "%VOICE_A%" (
     echo [ERROR] Voice A file not found at:
@@ -69,4 +82,3 @@ echo Done! Merged voice embedding saved to output\merged_identity.pt
 echo Test sample exported to output\test_blend.wav
 echo ========================================================
 pause
-
