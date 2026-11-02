@@ -1,0 +1,72 @@
+# ========================================================
+# StyleTTS-2 Repository .gitignore
+# ========================================================
+
+# Embedded Python Environment & Virtual Environments
+python_embeded/
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+
+# eSpeak-NG local binaries and unpacked distribution
+espeak-ng/
+*.msi
+
+# Model Checkpoints & Large Weights (>100MB exceed standard GitHub limits)
+models/*.pth
+models/*.pt
+models/*.bin
+models/*.onnx
+models/*.t7
+models/**/*.pth
+models/**/*.pt
+models/**/*.bin
+models/**/*.t7
+# Keep model configs tracked
+!models/config.yml
+!models/**/config.yml
+!models/**/.gitkeep
+
+# Output Audio and Generated Identity Embeddings
+output/*
+!output/.gitkeep
+
+# Input Reference Audio (Personal/custom voice clips)
+input/*.wav
+input/*.mp3
+input/*.flac
+input/*.ogg
+input/*.m4a
+!input/.gitkeep
+!input/sample_prompt.txt
+!input/dialogue.txt
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.bak
+.cache/
+.pytest_cache/
+
+# Operating System & IDE Artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+

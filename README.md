@@ -9,8 +9,12 @@ It is optimized for local Windows workstations and low-to-medium VRAM environmen
 ## Key Highlights
 
 - **Human-Level Prosody:** Uses latent style diffusion and SLM adversarial discriminators to produce natural pitch, cadence, and emotion without flat robotic cadences.
+- **Custom Voice Merging:** Interpolate two distinct vocal identities mathematically in the 128-dimensional latent style space ($s \in \mathbb{R}^{128}$) to synthesize unique biological vocal tracts without audio layering artifacts.
+- **Zero-Drift LLM Integration:** Freeze blended voice identities into persistent `.pt` tensors for low-latency streaming inference.
+- **Dedicated Batch Launchers:** 1-click batch scripts (`merge_voices.bat` and `synthesize_dialogue.bat`) configured with localized eSpeak-NG and embedded Python.
 - **Zero-Shot Voice Cloning:** Clone target voices using reference audio clips (3–10 seconds) with multi-speaker LibriTTS checkpoints.
 - **Low VRAM Consumption:** Requires only 2GB–4GB VRAM during diffusion sampling, comfortably operating on 6GB GPUs (RTX 2060) with fast real-time factor (< 0.1s RTF on CUDA).
+- **Comprehensive Documentation:** Full engineering guidelines and best practices available in [`doc/README.md`](doc/README.md) and [`doc/Voice_Crafting_Best_Practices.md`](doc/Voice_Crafting_Best_Practices.md).
 - **Automated Worker-Sower Staging:** Automatically detects `.txt` prompts and `.wav` reference clips placed in `input/` and stages finished 24kHz audio in `output/`.
 
 ---
