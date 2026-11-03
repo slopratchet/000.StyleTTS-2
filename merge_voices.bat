@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-title StyleTTS-2 - Voice Merger
+title Neural Voice Merger
 
 set "PATH=%~dp0python_embeded;%~dp0python_embeded\Scripts;%~dp0espeak-ng;C:\Program Files\eSpeak NG;%PATH%"
 if exist "C:\Program Files\eSpeak NG\libespeak-ng.dll" (
@@ -15,7 +15,7 @@ if exist "C:\Program Files\eSpeak NG\libespeak-ng.dll" (
 )
 
 echo ========================================================
-echo             StyleTTS-2 Voice Identity Merger            
+echo       Neural Voice Identity & Latent Space Merger       
 echo ========================================================
 
 set "VOICE_A=%~1"

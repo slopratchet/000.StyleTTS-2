@@ -10,7 +10,9 @@ A localized, self-contained pipeline for neural voice cloning, latent style merg
    - [1. `preprocess_audio.bat`](#1-preprocess_audiobat)
    - [2. `merge_voices.bat`](#2-merge_voicesbat)
    - [3. `synthesize_dialogue.bat`](#3-synthesize_dialoguebat)
-   - [4. `run_styletts2.bat`](#4-run_styletts2bat)
+   - [4. `adjust_voice.bat`](#4-adjust_voicebat)
+   - [5. `master_test_blend.bat`](#5-master_test_blendbat)
+   - [6. `run_styletts2.bat`](#6-run_styletts2bat)
 3. [Directory Layout](#directory-layout)
 4. [Python Scripts & CLI Reference](#python-scripts--cli-reference)
 5. [Acoustic Architecture: Latent Style Blending](#acoustic-architecture-latent-style-blending)
@@ -85,7 +87,24 @@ Synthesizes speech using the frozen `output/merged_identity.pt` created by the v
 
 ---
 
-### 4. `run_styletts2.bat`
+### 4. `adjust_voice.bat`
+Fine-tunes the pitch and playback rate of `output/test_blend.wav` (or any dragged-and-dropped `.wav` file) using floating-point user inputs powered by the **WORLD vocoder** (`pyworld`):
+- **Formant-Preserving Pitch Shift (Semitones):** Shifts fundamental pitch ($F_0$) independently of duration and vocal tract formants (e.g. `+1.5` for brighter register, `-2.0` for deeper chest tone, `0.0` for unchanged). Preserves the speaker's vocal tract envelope to prevent "chipmunk" or metallic robotic artifacts.
+- **Artifact-Free Rate Multiplier (Speed):** Stretches or compresses speech duration without phase-vocoder comb filtering (e.g. `1.15` for 15% faster, `0.90` for 10% slower/more deliberate, `1.0` for unchanged).
+- **Peak Limiting Ceiling:** Automatically normalizes output peaks to `-1.0 dBFS` to prevent digital clipping.
+- **Outputs Produced:** `output/test_blend_adjusted.wav` (or `<filename>_adjusted.wav`).
+
+---
+
+### 5. `master_test_blend.bat`
+Automates the audio mastering and vocoder artifact mitigation chain as specified in `doc/Creating a Custom LLM Voice.md`.
+- **Vocoder De-Bleed Filter:** Zero-phase EQ high-shelf rolloff (-3.0 dB) eliminating metallic sheen around the upper vocoder frequencies without phase smearing.
+- **Phase Alignment & DC Offset:** Removes DC bias and centers the waveform.
+- **EBU R128 / ITU-R BS.1770-4 Normalization:** Calibrates integrated loudness to consistent **-23.0 LUFS**.
+- **True Peak Limiting:** Enforces a true peak ceiling of **-1.0 dBFS**.
+- **Outputs Produced:** `output/test_blend_mastered.wav` and `output/test_blend_adjusted_mastered.wav` (automatically processes both if available, or any file passed via drag-and-drop).
+
+### 6. `run_styletts2.bat`
 The core launcher script that runs the default voice merging pipeline and checks environment integrity.
 
 ---
@@ -111,10 +130,14 @@ The core launcher script that runs the default voice merging pipeline and checks
 │   └── test_blend.wav              # Blend verification sample
 ├── python_embeded/                 # Isolated, self-contained Python 3.12 environment
 ├── scripts/                        # Automation & inference scripts
+│   ├── adjust_voice.py             # DSP pitch shifting & time stretching engine
 │   ├── llm_serving_example.py      # Zero-drift streaming LLM serving template
+│   ├── master_audio.py             # Audio mastering chain (de-bleed EQ, -23 LUFS, -1 dBFS peak)
 │   ├── merge_voices.py             # Latent style interpolation & export engine
 │   ├── preprocess_audio.py         # DSP pre-processing (HPF, de-esser, silence trim, peak norm)
 │   └── synthesize_dialogue.py      # Dialogue synthesizer supporting long-form text
+├── adjust_voice.bat                # 1-click batch launcher for voice pitch & rate adjustment
+├── master_test_blend.bat           # 1-click batch launcher for audio mastering & de-bleed
 ├── merge_voices.bat                # 1-click batch launcher for voice blending
 ├── preprocess_audio.bat            # 1-click batch launcher for audio DSP pre-processing
 ├── synthesize_dialogue.bat         # 1-click batch launcher for dialogue synthesis
@@ -139,6 +162,17 @@ python_embeded\python.exe scripts\merge_voices.py [OPTIONS]
 | `--output-pt` | `output/merged_identity.pt` | Output file for the frozen identity tensor |
 | `--output-wav` | `output/test_blend.wav` | Output file for the test audio take |
 | `--test-text` | Sample test sentence | Text spoken for the verification audio |
+
+### `scripts/adjust_voice.py`
+```dos
+python_embeded\python.exe scripts\adjust_voice.py [OPTIONS]
+```
+| Parameter | Default | Description |
+|---|---|---|
+| `--input` | `output/test_blend.wav` | Path to source `.wav` file |
+| `--output` | `None` (`<name>_adjusted.wav`) | Path to destination `.wav` file |
+| `--pitch` | `0.0` | Pitch shift in semitones (e.g. `+1.5`, `-2.0`, `0.0`) |
+| `--rate` | `1.0` | Rate multiplier (e.g. `1.15` = 15% faster, `0.90` = 10% slower) |
 
 ### `scripts/synthesize_dialogue.py`
 ```dos
